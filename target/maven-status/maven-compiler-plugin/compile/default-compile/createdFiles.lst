@@ -1,0 +1,15 @@
+com\cy\store\service\ex\ServiceException.class
+com\cy\store\controller\UserController.class
+com\cy\store\util\JsonResult.class
+com\cy\store\service\impl\UserServiceImpl.class
+com\cy\store\StoreApplication.class
+com\cy\store\service\ex\UsernameDuplicatedException.class
+com\cy\store\controller\BaseController.class
+com\cy\store\mapper\UserMapper.class
+com\cy\store\service\ex\InsertException.class
+com\cy\store\demos\web\User.class
+com\cy\store\demos\web\PathVariableController.class
+com\cy\store\entity\User.class
+com\cy\store\demos\web\BasicController.class
+com\cy\store\service\IUserService.class
+com\cy\store\entity\BaseEntity.class
