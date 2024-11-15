@@ -1,11 +1,14 @@
 package com.cy.store.mapper;
 
 import com.cy.store.entity.User;
+import org.apache.ibatis.annotations.Param;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Date;
 
 //@SpringBootTest注解 表示标注当前的类是一个测试类，不会随同项目一起打包发送
 @SpringBootTest
@@ -36,5 +39,40 @@ public class UserMapperTests {
     public void findByUsername() {
         User user = userMapper.findByUsername("tim");
         System.out.println(user);
+    }
+
+    @Test
+    // 单元测试方法 不能有参数列表
+    public void updatePasswordByUid() {
+        Integer rows = userMapper.updatePasswordByUid(
+                7, "321",
+                "管理员", new Date());
+        System.out.println("受影响的行数为：" + rows);
+    }
+
+    @Test
+    public void findByUid() {
+        User user = userMapper.findByUid(7);
+        System.out.println(user);
+    }
+
+    @Test
+    public void updateInfoByUid() {
+        User user = new User();
+        user.setUid(7);
+        user.setPhone("15511110000");
+        user.setEmail("test001.qq.com");
+        user.setGender(1);
+        userMapper.updateInfoByUid(user);
+    }
+
+    @Test
+    public void updateAvatarByUid() {
+        Integer uid = 1;
+        String avatar = "/a.png";
+        String modifiedUser = "系统管理员";
+        Date modifiedTime = new Date();
+        userMapper.updateAvatarByUid(uid, avatar,
+                                    modifiedUser, modifiedTime);
     }
 }

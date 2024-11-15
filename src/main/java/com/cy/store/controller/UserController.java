@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //@Controller
@@ -75,4 +76,45 @@ public class UserController extends BaseController{
 
         return new JsonResult<User>(OK, limitedUser);
     }
+
+    /**
+     * 控制层的changePassword()方法实现
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @param session
+     * @return OK
+     */
+    @RequestMapping("change_password")
+    public JsonResult<Void> changePassword(String oldPassword,
+                                           String newPassword,
+                                           HttpSession session) {
+        Integer uid = getUidFromSession(session);
+        String username = getUsernameFromSession(session);
+        userService.changePassword(uid, username,
+                oldPassword, newPassword);
+        return new JsonResult<>(OK);
+    }
+
+    @RequestMapping("get_by_uid")
+    public JsonResult<User> getByUid(HttpSession session) {
+        //System.out.println("测试控制层是否启动");
+        Integer uid = getUidFromSession(session);
+        User data = userService.getByUid(uid);
+        //uid和email都是null？修改了UserServiceImpl中public User getByUid(Integer uid)方法的的返回值
+        //System.out.println(data.getUid()+" "+data.getPhone()+" "+data.getEmail()+" "+ data.getGender());
+        return new JsonResult<>(OK, data);
+    }
+    // 在url中测试一下
+
+    @RequestMapping("change_info")
+    public JsonResult<Void> changeInfo(User user, HttpSession session) {
+        // user对象有四部分数据：username、phone、email、gender
+        // （html表单中有同名字段，则会自动注入至user）
+        // uid还没有，需要从session里再次封装到user对象中。
+        Integer uid = getUidFromSession(session);
+        String username = getUsernameFromSession(session);
+        userService.changeInfo(uid, username, user);
+        return new JsonResult<>(OK);
+    }
+
 }

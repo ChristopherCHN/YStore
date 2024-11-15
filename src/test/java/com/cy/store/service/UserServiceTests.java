@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Date;
+
 //@SpringBootTest注解 表示标注当前的类是一个测试类，不会随同项目一起打包发送
 @SpringBootTest
 //@RunWith注解 表示启动这个单元测试类。
@@ -45,7 +47,7 @@ public class UserServiceTests {
     public void login() {
         try {
             User limitedUser =
-                    iUserService.login("test001", "123");
+                    iUserService.login("test002", "123");
             System.out.println(limitedUser);
         } catch (ServiceException e) {
             //throw new RuntimeException(e);
@@ -54,5 +56,32 @@ public class UserServiceTests {
             //获取异常的具体描述信息（先前自定义了被抛出时打印的内容）
             System.out.println(e.getMessage());
         }
+    }
+
+    @Test
+    public void changePassword() {
+        try {
+            iUserService.changePassword(4, "yuanxin03",
+                    "123","456");
+        } catch (ServiceException e) {
+            //throw new RuntimeException(e);
+            //先获取类的对象，再获取类的名称
+            System.out.println(e.getClass().getSimpleName());
+            //获取异常的具体描述信息（先前自定义了被抛出时打印的内容）
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    public void changeInfo() {
+        // uid=6的一些基本资料为空，按理来说应该报错
+        Integer uid = 6;
+        String username = "user0002";
+        User smalluser = new User();
+        //smalluser.setUid(6);
+        //smalluser.setUsername("user0002");
+        //smalluser.setModifiedTime(new Date());
+        iUserService.changeInfo(uid, username,
+                smalluser);
     }
 }

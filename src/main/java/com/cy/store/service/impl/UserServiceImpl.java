@@ -3,10 +3,7 @@ package com.cy.store.service.impl;
 import com.cy.store.entity.User;
 import com.cy.store.mapper.UserMapper;
 import com.cy.store.service.IUserService;
-import com.cy.store.service.ex.InsertException;
-import com.cy.store.service.ex.PasswordNotMatchException;
-import com.cy.store.service.ex.UserNotFoundException;
-import com.cy.store.service.ex.UsernameDuplicatedException;
+import com.cy.store.service.ex.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -123,5 +120,78 @@ public class UserServiceImpl implements IUserService {
         return limitedUser;
     }
 
+    @Override
+    public void changePassword(Integer uid, String username,
+                               String oldPassword, String newPassword) {
+        User result = userMapper.findByUid(uid);
+        //System.out.println(uid);
+        if (result == null || result.getIsDelete() == 1) {
+            //System.out.println("用户数据不存在");
+            throw new UserNotFoundException("用户数据不存在");
+        }
+        // 原始密码和数据库中的密码进行比较
+        //System.out.println("盐值 " + result.getSalt());
+        //System.out.println("系统中加密后的原密码 " + result.getPassword());
+        //System.out.println("传入该方法体的未加密的密码 " + oldPassword); //传入的oldPassword==null
+        String oldMD5Password =
+                getMD5Password(oldPassword, result.getSalt());
+        if (! result.getPassword().equals(oldMD5Password)) {
+            //System.out.println("用户密码错误");
+            throw new PasswordNotMatchException("密码错误");
+        }
+        // 将新的密码设置到数据库中：将新的密码进行加密后，再进行更新。
+        String newMD5Password =
+                getMD5Password(newPassword, result.getSalt());
+        Integer rows =
+                userMapper.updatePasswordByUid(uid, newMD5Password,
+                                        username, new Date());
+        if (rows != 1) {
+            throw new UpdateException("更新数据时，产生未知的异常");
+        }
+    }
 
+    @Override
+    // 控制层可以直接调用本层（业务层）的getByUid方法，获取smallUser的实例
+    public User getByUid(Integer uid) {
+        //System.out.println(uid);
+        User result = userMapper.findByUid(uid);
+        //System.out.println(result.getUid());
+        if (result == null  || result.getIsDelete()==1) {
+            throw new UserNotFoundException("用户数据不存在");
+        }
+        //System.out.println(result.getUsername());
+        User smallUser = new User(); //准备给前端设置默认值使用
+        smallUser.setUid(result.getUid());
+        smallUser.setUsername(result.getUsername());
+        smallUser.setPhone(result.getPhone());
+        //System.out.println("smallUser.getPhone() "+smallUser.getPhone());
+        smallUser.setEmail(result.getEmail());
+        smallUser.setGender(result.getGender());
+
+        return smallUser;
+    }
+
+    /**
+     * 当前User对象中的数据只有三部分
+     * （SpringBoot只注册表单中的值，
+     * 表单中不存在的值uid和username需要被手动封装）
+     */
+    @Override
+    public void changeInfo(Integer uid, String username, User user) {
+        // 业务层的uid是在登录后从控制层由session读出来的
+        User result = userMapper.findByUid(uid);
+        if (result == null  || result.getIsDelete()==1) {
+            throw new UserNotFoundException("用户数据不存在");
+        }
+        user.setUid(uid);
+        // 表单中已经存在，所以省略
+        // user.setUsername(username);
+        user.setModifiedUser(username);
+        user.setModifiedTime(new Date());
+
+        Integer rows = userMapper.updateInfoByUid(user);
+        if (rows != 1) {
+            throw new UpdateException("更新数据时产生未知的异常");
+        }
+    }
 }

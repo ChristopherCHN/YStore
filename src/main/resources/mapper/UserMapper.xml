@@ -23,7 +23,7 @@
     </resultMap>
 
     <!-- id表示映射接口中方法名称，直接在标签内部编写sql语句-->
-    <!-- uid是主键，sql语言设定为自增（AUTO_INCREMENT），不写在下面的语句中 -->
+    <!-- uid是主键，sql语言已设定为自增（AUTO_INCREMENT），不写在下面的语句中 -->
     <!--
         useGeneratedKeys属性：表示开启某个字段（一般是主键）值的递增
         keyProperty属性：设为递增的字段对应的【实体类的属性名】
@@ -51,4 +51,39 @@
     <select id="findByUsername" resultMap="UserEntityMap">
         SELECT * from t_user WHERE username = #{username}
     </select>
+
+    <update id="updatePasswordByUid" >
+        UPDATE t_user SET
+            password=#{password},
+            modified_user=#{modifiedUser},
+            modified_time=#{modifiedTime}
+        WHERE uid=#{uid}
+    </update>
+
+    <select id="findByUid" resultMap="UserEntityMap">
+        SELECT * FROM t_user WHERE uid=#{uid}
+    </select>
+
+    <update id="updateInfoByUid">
+        UPDATE t_user SET
+        <!--if是条件判断标签，test属性接收的是一个返回值为boolean类型的条件。
+            如果test的条件结果为真，则if标签内的语句执行-->
+        <if test="phone!=null">phone=#{phone},</if>
+        <if test="email!=null">email=#{email},</if>
+        <if test="gender!=null">gender=#{gender},</if>
+        modified_user=#{modifiedUser},
+        modified_time=#{modifiedTime}
+        WHERE uid=#{uid}
+    </update>
+
+    <update id="updateAvatarByUid">
+        UPDATE t_user
+        SET
+            avatar=#{avatar},
+            modified_user=#{modifiedUser},
+            modified_time=#{modifiedTime}
+        WHERE
+            uid=#{uid}
+    </update>
+
 </mapper>

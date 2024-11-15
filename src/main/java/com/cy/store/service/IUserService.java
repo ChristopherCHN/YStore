@@ -17,4 +17,32 @@ public interface IUserService {
      * @return 当前匹配的用户数据。若无，则返回null
      */
     User login(String username, String password);
+
+    /**
+     *
+     * @param uid
+     * @param username
+     * @param oldPassword
+     * @param newPassword
+     */
+    void changePassword(Integer uid,
+                        String username,
+                        String oldPassword,
+                        String newPassword);
+
+    /**
+     * 根据用户的id查询用户某些数据
+     * @param uid 用户id
+     * @return 用户的数据
+     */
+    User getByUid(Integer uid);
+
+    /**
+     * 更新用户的数据
+     * @param uid 用户的id
+     * @param username 用户的名称
+     * @param user 用户对象的数据
+     */
+    void changeInfo(Integer uid, String username,
+                    User user);
 }
