@@ -156,10 +156,17 @@
 					success: function (json) {
 						if (json.state == 200) {
 							alert("登录成功！");
+							//console.log(json.data.avatar);
 							// 跳转到主页index.html
 							// 相对路径来确定跳转的页面。
 							// 同级可加./也可不加；上级则需加../
 							location.href = "./index.html";
+							// 点击按钮后，发送请求给服务器，控制层执行并返回包含avatar的json回来
+							// 将服务器端返回的头像设置到cookie中，第一个参数是cookie的名字
+							console.log(json.data.avatar);
+							// 这里必须是先上传过一次头像才能在cookie中加以记录
+							// 后续有修改必要
+							$.cookie("avatar", json.data.avatar, {expires: 7});
 						} else {
 							alert("登录失败！");
 						}

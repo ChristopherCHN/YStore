@@ -84,4 +84,12 @@ public class UserServiceTests {
         iUserService.changeInfo(uid, username,
                 smalluser);
     }
+
+    @Test
+    public void changeAvatar() {
+        Integer uid = 1;
+        String avatar = "./业务层测试后.jpg";
+        String username = "业务层测试管理员";
+        iUserService.changeAvatar(uid, avatar, username);
+    }
 }

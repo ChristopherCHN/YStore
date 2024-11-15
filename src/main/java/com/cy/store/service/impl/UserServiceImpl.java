@@ -112,6 +112,7 @@ public class UserServiceImpl implements IUserService {
         User limitedUser = new User();
         limitedUser.setUid(result.getUid());
         limitedUser.setUsername(result.getUsername());
+        // 这里返回有用户的头像
         limitedUser.setAvatar(result.getAvatar());
 
         // 返回用户数据。
@@ -167,6 +168,7 @@ public class UserServiceImpl implements IUserService {
         //System.out.println("smallUser.getPhone() "+smallUser.getPhone());
         smallUser.setEmail(result.getEmail());
         smallUser.setGender(result.getGender());
+        smallUser.setAvatar(result.getAvatar());
 
         return smallUser;
     }
@@ -192,6 +194,20 @@ public class UserServiceImpl implements IUserService {
         Integer rows = userMapper.updateInfoByUid(user);
         if (rows != 1) {
             throw new UpdateException("更新数据时产生未知的异常");
+        }
+    }
+
+    @Override
+    public void changeAvatar(Integer uid, String avatar, String username) {
+        // 检测用户数据是否存在
+        User result = userMapper.findByUid(uid);
+        if (result == null || result.getIsDelete() == 1) { // 既然引入了判断，就得保证涉及到的所有作判断的变量不能为空
+            throw new UserNotFoundException("用户数据不存在");
+        }
+        Integer rows = userMapper.updateAvatarByUid(uid, avatar,
+                        username, new Date());
+        if (rows != 1) {
+            throw new UpdateException("更新头像时产生未知的异常");
         }
     }
 }

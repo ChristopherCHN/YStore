@@ -13,6 +13,7 @@
 		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
 		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
 		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<script src="../bootstrap3/js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 		<!-- 字体图标 -->
 		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
 		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
@@ -136,20 +137,30 @@
 					</ul>
 					<div class="panel-body">
 						<!--上传头像表单开始-->
-						<form class="form-horizontal" role="form">
+						<!-- form标签内本来有这么一段：
+							  action="/users/change_avatar"
+							  method="post"
+							  enctype="multipart/form-data" -->
+						<form id="form-change-avatar"
+							  class="form-horizontal" role="form">
 							<div class="form-group">
 								<label class="col-md-2 control-label">选择头像:</label>
 								<div class="col-md-5">
+									<!--src默认是../images/index/user.jpg-->
 									<img id="img-avatar" src="../images/index/user.jpg" class="img-responsive" />
 								</div>
 								<div class="clearfix"></div>
 								<div class="col-md-offset-2 col-md-4">
+									<!--type="file"是为了组件支持文件类型
+									  name="file"是因为与控制层接收的参数匹配-->
 									<input type="file" name="file">
 								</div>
 							</div>
 							<div class="form-group">
 								<div class="col-sm-offset-2 col-sm-10">
-									<input type="submit" class="btn btn-primary" value="上传" />
+									<!--要是让表单提交数据，确定type="button"
+									submit不能添加点击事件-->
+									<input id="btn-change-avatar" type="button" class="btn btn-primary" value="上传" />
 								</div>
 							</div>
 						</form>
@@ -242,6 +253,99 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+
+		<script type="text/javascript">
+			//启动对btn-login按钮的监听
+			$("#btn-change-avatar").click(function () {
+				$.ajax({
+					url: "/users/change_avatar",
+					type: "POST",
+					// serialize()提交的是串的类型，不能提交文件类型
+					// new一个FormData对象，传入表单中的第几个元素
+					data: new FormData($("#form-change-avatar")[0]),
+					processData: false, // 关闭以串的形式处理数据
+					contentType: false, // 关闭以串的形式提交数据
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							alert("头像修改成功！");
+							// 把设置好的头像传回来
+							// 将服务器端返回的头像地址设置img标签的src属性上
+							// 给一个已存在的属性设置新的值，第一个参数是属性，第二个参数是给属性设置的值（这里是新头像的地址）
+							// console.log(json.data);
+							$("#img-avatar").attr("src", json.data); // 这里的json.data是/users/change_avatar绑定方法返回的值，与下面users/get_by_id方法不同，是正确的
+							// 将头像保存在cookie中（不清理的话短时能保持）
+							//$.cookie();
+						} else {
+							alert("头像修改失败！");
+						}
+					},
+					error: function (xhr) {
+						alert("头像修改时产生未知的异常。错误信息：" + xhr.message);
+					}
+				});
+			});
+		</script>
+
+		<!--读取cookie中的头像-->
+		<!-- 存放在cookie中容易出错，所以改正为从数据库中读取
+		<script type="text/javascript">
+			$(document).ready(function () {
+				// 声明一个avatar变量，给cookie的值找个地方放下
+				let avatar = $.cookie("avatar");
+				//console.log(avatar);
+				// 将cookie中的值设置到头像的src属性上。
+				$("#img-avatar").attr("src", avatar);
+			});
+		</script>
+		-->
+		<script type="text/javascript">
+			/** 一旦检测到当前的页面被加载，就会触发ready方法 */
+			$(document).ready(function() {
+				$.ajax({
+					url: "/users/get_by_uid",
+					type: "POST",
+					data: new FormData($("#form-change-avatar")[0]),
+					processData: false, // 关闭以串的形式处理数据
+					contentType: false, // 关闭以串的形式提交数据
+					dataType: "json",
+					success: function (json) {
+						//console.log(json);
+						//console.log(json.data.avatar);
+						if (json.data.avatar != null) {
+							if (json.state == 200) {
+								// 将查询到的json.data.avatar路径设置给图片
+								//$("#img-avatar").attr("src", json.data.avatar);
+
+								// 使用 Image 对象检测图片是否存在
+								var img = new Image();
+								img.src = json.data.avatar; // 设置图片的 URL
+								img.onload = function () {
+									// 图片加载成功
+									console.log(json.data.avatar);
+									$("#img-avatar").attr("src", json.data.avatar);
+								};
+								img.onerror = function () {
+									// 图片加载失败，回退到默认头像
+									alert("服务器上曾存储有头像，但已损坏，请联系管理员！");
+									// 由于 HTML 中已经设置了默认头像，这里可以不设置
+									// $("#img-avatar").attr("src", "../images/index/default-user.jpg");
+								};
+							} else {
+								alert("用户数据不存在，无法读取当前头像！");
+							}
+						}
+						else {
+							alert("用户头像字段为空，请设置头像！");
+						}
+					},
+					error: function (xhr) {
+						alert("查询用户信息时，产生了未知的错误！错误代码为 " + " " + xhr.status);
+					}
+				});
+			});
+		</script>
+
 	</body>
 
 </html>

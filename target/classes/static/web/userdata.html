@@ -278,8 +278,7 @@
 					dataType: "json",
 					success: function (json) {
 						if (json.state == 200) {
-							console.log("User Phone:", json.data.phone); // 检查 phone 是否存在
-							//alert("注册成功！");
+							//console.log("User Phone:", json.data.phone); // 检查 phone 是否存在
 							// 将查询到的数据重新设置到控件中
 							// val()用于给一个文本框控件赋值
 							$("#username").val(json.data.username);

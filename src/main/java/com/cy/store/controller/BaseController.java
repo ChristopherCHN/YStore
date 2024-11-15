@@ -1,5 +1,6 @@
 package com.cy.store.controller;
 
+import com.cy.store.controller.ex.*;
 import com.cy.store.service.ex.*;
 import com.cy.store.util.JsonResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,7 +16,8 @@ public class BaseController {
     //请求处理方法，这个方法的返回值就是需要传递给前端的数据。
     //自动将异常对象传递给此方法的参数列表上
     //当项目中产生了异常，会被统一拦截到此方法中，这个方法此时就充当了请求处理方法，方法的返回值直接给到前端。
-    @ExceptionHandler(ServiceException.class) //该注解用于统一处理抛出的异常
+    @ExceptionHandler({ServiceException.class,
+                        FileUploadException.class}) //该注解用于统一处理抛出的异常
     public JsonResult<Void> handleException(Throwable e) {
         JsonResult<Void> result = new JsonResult<>(e);
         if (e instanceof UsernameDuplicatedException) {
@@ -41,6 +43,23 @@ public class BaseController {
               result.setMessage("更新数据时产生未知的异常");
         }
 
+          else if (e instanceof FileEmptyException) {
+              result.setState(6000);
+              result.setMessage("上传的文件为空，请重新上传！");
+        } else if (e instanceof FileSizeException) {
+            result.setState(6001);
+            result.setMessage("上传的文件大小超过10M，请重新上传！");
+        } else if (e instanceof FileTypeException) {
+            result.setState(6002);
+            result.setMessage("上传的文件类型有误，请重新上传！");
+        } else if (e instanceof FileStateException) {
+            result.setState(6003);
+            result.setMessage("上传的文件状态异常，请关闭其他正在使用本文件的程序后重新上传！");
+        } else if (e instanceof FileUploadIOException) {
+            result.setState(6004);
+            result.setMessage("上传的文件出现IO异常！");
+        }
+
         return result;
     }
 
@@ -62,5 +81,7 @@ public class BaseController {
     protected final String getUsernameFromSession(HttpSession session) {
         return session.getAttribute("username").toString();
     }
+
+
 
 }
