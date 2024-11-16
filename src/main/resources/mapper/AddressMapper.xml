@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cy.store.mapper.AddressMapper">
+    <resultMap id="AddressEntityMap" type="com.cy.store.entity.Address">
+        <!--将表的字段和类的属性 不一致 的字段进行匹配指定，一致的则可以省略不写-->
+        <!--column属性：表中字段名 property属性：类中属性名 两者配合完成名称不一致的映射-->
+        <!--定义映射规则时，主键不允许省略！注意检查所有在表中出现过的column！-->
+        <id column="aid" property="aid"></id> <!--t_address表的主键是aid-->
+        <result column="province_name" property="provinceName"></result>
+        <result column="province_code" property="provinceCode"></result>
+        <result column="city_name" property="cityName"></result>
+        <result column="city_code" property="cityCode"></result>
+        <result column="area_name" property="areaName"></result>
+        <result column="area_code" property="areaCode"></result>
+        <result column="is_default" property="isDefault"></result>
+        <result column="created_user" property="createdUser"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="modified_user" property="modifiedUser"></result>
+        <result column="modified_time" property="modifiedTime"></result>
+    </resultMap>
+
+    <!--useGeneratedKeys的true表示开启主键自增，keyProperty声明主键-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="aid">
+        INSERT INTO t_address (
+            uid, name, province_name, province_code,
+            city_name, city_code, area_name, area_code,
+            zip, address, phone,
+            tel, tag, is_default,
+            created_user, created_time, modified_user, modified_time
+        ) VALUES (
+            #{uid}, #{name}, #{provinceName}, #{provinceCode},
+            #{cityName}, #{cityCode}, #{areaName}, #{areaCode},
+            #{zip}, #{address}, #{phone},
+            #{tel}, #{tag}, #{isDefault},
+            #{createdUser}, #{createdTime}, #{modifiedUser}, #{modifiedTime}
+        )
+    </insert>
+
+    <select id="countByUid" resultType="java.lang.Integer">
+        <!--说明:resultType属性在结果是基础数据类型的情况下可以省略-->
+        SELECT count(*) FROM t_address WHERE uid=#{uid}
+    </select>
+
+</mapper>

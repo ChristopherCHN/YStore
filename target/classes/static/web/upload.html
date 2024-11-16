@@ -327,7 +327,7 @@
 								};
 								img.onerror = function () {
 									// 图片加载失败，回退到默认头像
-									alert("指定路径的头像图片不存在，无法显示！");
+									alert("服务器上曾存储有头像，但已损坏，请联系管理员！");
 									// 由于 HTML 中已经设置了默认头像，这里可以不设置
 									// $("#img-avatar").attr("src", "../images/index/default-user.jpg");
 								};
