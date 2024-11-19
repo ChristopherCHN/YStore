@@ -26,7 +26,7 @@
     <!-- uid是主键，sql语言已设定为自增（AUTO_INCREMENT），不写在下面的语句中 -->
     <!--
         useGeneratedKeys属性：表示开启某个字段（一般是主键）值的递增
-        keyProperty属性：设为递增的字段对应的【实体类的属性名】
+        keyProperty属性：设为自增的字段对应的【实体类的属性名】
     -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
         INSERT INTO t_user (

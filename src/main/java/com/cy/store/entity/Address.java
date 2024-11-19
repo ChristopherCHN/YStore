@@ -154,4 +154,26 @@ public class Address extends BaseEntity implements Serializable {
     public int hashCode() {
         return Objects.hash(super.hashCode(), aid, uid, name, provinceName, provinceCode, cityName, cityCode, areaName, areaCode, zip, address, phone, tel, tag, isDefault);
     }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "aid=" + aid +
+                ", uid=" + uid +
+                ", name='" + name + '\'' +
+                ", provinceName='" + provinceName + '\'' +
+                ", provinceCode='" + provinceCode + '\'' +
+                ", cityName='" + cityName + '\'' +
+                ", cityCode='" + cityCode + '\'' +
+                ", areaName='" + areaName + '\'' +
+                ", areaCode='" + areaCode + '\'' +
+                ", zip='" + zip + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", tel='" + tel + '\'' +
+                ", tag='" + tag + '\'' +
+                ", isDefault=" + isDefault +
+                ", createdUser=" + this.getCreatedUser() +
+                '}';
+    }
 }

@@ -19,9 +19,15 @@
 		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
 		<link rel="stylesheet" type="text/css" href="../css/top.css" />
 		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<!--设计数据库后，不希望再从js文件中读取-->
+		<!--
 		<script type="text/javascript" src="../js/distpicker.data.js"></script>
 		<script type="text/javascript" src="../js/distpicker.js"></script>
+		-->
+
+
 	</head>
+
 
 	<body>
 		<!--头部-->
@@ -287,6 +293,195 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+
+		<script type="text/javascript">
+			// 加载后0.2s刷新
+			// window.onload在所有资源加载过后才执行，晚于$(document).ready
+			window.onload = function() {
+				// 页面加载完成后延迟一段时间,刷新一次
+				// 检查 sessionStorage 中是否有刷新标记
+				if (!sessionStorage.getItem("hasReloaded")) {
+					// 设置刷新标记
+					sessionStorage.setItem("hasReloaded", "true");
+					// 刷新页面
+					location.reload();
+				}
+			}
+
+			// option的值只认value（是code值，才能拿到数据库中name的值）
+			// 给默认的0表示在数据库中找不到，所以必须赶在发送ajax请求前及时截断运行
+			// option标签内部的内容是请选择，value=0，value可被var()方法捕获。
+			let defaultOption =
+					"<option value='0'>---- 请选择 ----</option>"
+
+			$(document).ready(function () {
+				// 此方法经过优化。
+
+				// 省、市、县的值默认定为defaultOption。
+				// 给某个标签追加子标签，也即option标签
+				$("#province-list").append(defaultOption);
+				showProvinceList();
+				$("#city-list").append(defaultOption);
+				$("#area-list").append(defaultOption);
+			});
+
+			/**
+			 * 省级单位
+			 * change()函数用于监听某个控件是否发生改变。
+			 * 一旦发生改变，就会触发参数的函数。
+			 * change()需要传递一个function(){}
+			 */
+			$("#province-list").change(function () {
+				// 先获取到行政区父代码（provinceCode）
+				// 子标签的value是code，而对外显示的是name
+				// val()函数可直接获取并给parent赋值。
+				let parent = $("#province-list").val();
+				// 为了避免追加在之前选择的省所辖市的下面，必须先清空市、县（select下拉列表控件）内部的所有子标签
+				$("#city-list").empty();
+				$("#area-list").empty();
+				// 填充默认值“请选择”
+				$("#city-list").append(defaultOption);
+				$("#area-list").append(defaultOption);
+
+				// defaultOption一旦被添加，该选项被选中时，
+				// var()获取到的parent值=0，
+				// 此后不用发送请求以接收次级行政区域的名单
+				if (parent == 0) {
+					// 更改的即刻已经清理过市县了
+					return;
+				}
+
+				$.ajax({
+					url: "/districts/",
+					type: "POST",
+					// 自动匹配并调用控制层的getByParent方法及以下层的依赖方法
+					data: "parent=" + parent, //需要自己写。之前通过serialize()方法自动获取后，执行出来的也是属性=值的样子
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							// 从控制层返回了一个List
+							let list = json.data;
+							// 拼接option的项
+							for (let i = 0; i < list.length; i++) {
+								// 注意引号的位置。value里面的内容必须用引号框起来。
+								// 例如：不能value=110100，而应该是value='110100'
+								let opt =
+										"<option value='" + list[i].code + "'>"+list[i].name+"</option>"
+								$("#city-list").append(opt);
+							}
+						} else {
+							alert("地级行政区（或省直管市）信息信息加载失败！");
+						}
+					}/*,
+					error: function (xhr) {
+						alert("新增收货地址时产生未知的异常。错误信息：" + xhr.message);
+					}*/
+				});
+			});
+
+			/**
+			 * 地级单位
+			 */
+			$("#city-list").change(function () {
+				// 先获取到行政区父代码（provinceCode）
+				// 子标签的value是code，而对外显示的是name
+				// val()函数可直接获取并给parent赋值。
+				let parent = $("#city-list").val();
+				// 为了避免追加在之前选择的省所辖市的下面，必须先清空市、县（select下拉列表控件）内部的所有子标签
+				$("#area-list").empty();
+				// 填充默认值“请选择”
+				$("#area-list").append(defaultOption);
+
+				// defaultOption一旦被添加，该选项被选中时，var()获取到的parent值=0，此后不用发送请求以接收次级行政区域的名单
+				if (parent == 0) {
+					// 更改的即刻已经清理过市县了
+					return;
+				}
+
+				$.ajax({
+					url: "/districts/",
+					type: "POST",
+					// 自动匹配并调用控制层的getByParent方法及以下层的依赖方法
+					data: "parent=" + parent, //需要自己写。之前通过serialize()方法自动获取后，执行出来的也是属性=值的样子
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							// 从控制层返回了一个List
+							let list = json.data;
+							// 拼接option的项
+							for (let i = 0; i < list.length; i++) {
+								// 注意引号的位置。value里面的内容必须用引号框起来。
+								// 例如：不能value=110100，而应该是value='110100'
+								let opt =
+										"<option value='" + list[i].code + "'>"+list[i].name+"</option>"
+								$("#area-list").append(opt);
+							}
+						} else {
+							alert("县级行政区信息信息加载失败！");
+						}
+					}/*,
+					error: function (xhr) {
+						alert("新增收货地址时产生未知的异常。错误信息：" + xhr.message);
+					}*/
+				});
+			});
+
+			// 省一级的下拉列表数据展示
+			function showProvinceList() {
+				$.ajax({
+					url: "/districts/",
+					type: "POST",
+					// 自动匹配并调用控制层的getByParent方法及以下层的依赖方法
+					data: "parent=86", //需要自己写。之前通过serialize()方法自动获取后，执行出来的也是属性=值的样子
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							// 从控制层返回了一个List
+							let list = json.data;
+							// 拼接option的项
+							for (let i = 0; i < list.length; i++) {
+								// 注意引号的位置。value里面的内容必须用引号框起来。
+								// 例如：不能value=110100，而应该是value='110100'
+								let opt =
+										"<option value='" + list[i].code + "'>"+list[i].name+"</option>"
+								// 给province-list标签注入一项名为value的子标签，子标签的value是code，内容是name
+								$("#province-list").append(opt);
+							}
+						} else {
+							alert("省（直辖市、自治区、特别行政区）信息加载失败！");
+						}
+					}/*,
+					error: function (xhr) {
+						alert("新增收货地址时产生未知的异常。错误信息：" + xhr.message);
+					}*/
+				});
+			}
+
+			// 点击保存，储存一条收货地址。
+			$("#btn-add-new-address").click(function () {
+				$.ajax({
+					url: "/addresses/add_new_address",
+					type: "POST",
+					// 表单内所有数据的序列化。例如，name为provinceCode的选项卡，
+					// 此时value=210000（辽宁省的provinceCode)，
+					// 序列化时provinceCode=210000即被读取，并以json串的形式
+					// 传给控制层下注解有@RequestMapper指定虚拟路径的方法加以执行。
+					data: $("#form-add-new-address").serialize(),
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							alert("新增收货地址成功！");
+							} else { // 可以在此声明具体错误代码并返回给前端警示
+							alert("新增收货地址失败！");
+						}
+					},
+					error: function (xhr) {
+						alert("新增收货地址时产生未知的异常。错误信息：" + xhr.message);
+					}
+				});
+			});
+		</script>
+
 	</body>
 
 </html>

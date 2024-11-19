@@ -44,4 +44,40 @@
         SELECT count(*) FROM t_address WHERE uid=#{uid}
     </select>
 
+    <!--一旦有写法不一致的变量出现，就要声明resultMap映射规则-->
+    <select id="findByUid" resultMap="AddressEntityMap" resultType="com.cy.store.entity.Address">
+        SELECT * FROM t_address
+        WHERE uid=#{uid}
+        ORDER BY is_default DESC, created_time DESC
+    </select>
+
+    <update id="updateNonDefault">
+        UPDATE t_address
+        SET is_default=0
+        WHERE uid=#{uid}
+    </update>
+    
+    <update id="updateDefaultByAid">
+        UPDATE t_address
+        SET is_default=1,
+            modified_user=#{modifiedUser},
+            modified_time=#{modifiedTime}
+        WHERE aid=#{aid}
+    </update>
+    
+    <select id="findByAid" resultMap="AddressEntityMap" resultType="com.cy.store.entity.Address">
+        SELECT * from t_address
+        WHERE aid=#{aid}
+    </select>
+
+    <delete id="deleteByAid">
+        DELETE FROM t_address
+        WHERE aid=#{aid}
+    </delete>
+
+    <select id="findLastModified" resultMap="AddressEntityMap" resultType="com.cy.store.entity.Address">
+        SELECT * FROM t_address
+        WHERE uid=#{uid}
+        ORDER BY modified_time DESC LIMIT 0,1
+    </select>
 </mapper>
