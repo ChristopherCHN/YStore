@@ -46,15 +46,15 @@ public class District extends BaseEntity{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof District)) return false;
         if (!super.equals(o)) return false;
         District district = (District) o;
-        return Objects.equals(id, district.id) && Objects.equals(parent, district.parent) && Objects.equals(code, district.code) && Objects.equals(name, district.name);
+        return Objects.equals(getId(), district.getId()) && Objects.equals(getParent(), district.getParent()) && Objects.equals(getCode(), district.getCode()) && Objects.equals(getName(), district.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, parent, code, name);
+        return Objects.hash(super.hashCode(), getId(), getParent(), getCode(), getName());
     }
 
     @Override

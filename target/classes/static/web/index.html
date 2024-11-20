@@ -181,6 +181,9 @@
 							<p class="panel-title">热销排行</p>
 						</div>
 						<div id="hot-list" class="panel-body panel-item">
+							<!--四个子div里放了四件热销商品。
+							需要获取上层div（hot-list）的值，将写死的值改成动态的-->
+							<!--
 							<div class="col-md-12">
 								<div class="col-md-7 text-row-2"><a href="product.html">广博(GuangBo)10本装40张A5牛皮纸记事本子日记本办公软抄本GBR0731</a></div>
 								<div class="col-md-2">¥23</div>
@@ -200,7 +203,7 @@
 								<div class="col-md-7 text-row-2"><a href="product.html">戴尔Dell 燃700R1605银色</a></div>
 								<div class="col-md-2">¥3799</div>
 								<div class="col-md-3"><img src="../images/portal/11DELLran7000R1605Ssilvery/collect.png" class="img-responsive" /></div>
-							</div>
+							</div>-->
 						</div>
 					</div>
 				</div>
@@ -290,6 +293,47 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+
+		<script type="text/javascript">
+			$(document).ready(function(){
+				showHotList();
+			});
+
+			function showHotList() {
+				$("#hot-list").empty();
+				$.ajax({
+					url: "/products/hot_list",
+					type: "POST",
+					dataType: "JSON",
+					success: function(json) {
+						let list = json.data;
+						console.log("count=" + list.length);
+						for (let i = 0; i < list.length; i++) {
+							console.log(list[i].title);
+							// 当前文件在web文件夹里。
+							// #{image}占位符代表的字段内容本身前后都有斜杠，所以这里不加
+							// js部分，不能加"<!---->"注释，会被视为语法错误。
+							let html = '<div class="col-md-12">' +
+									'<div class="col-md-7 text-row-2"><a href="product.html?id=#{id}">#{title}</a></div>' +
+									'<div class="col-md-2">¥#{price}</div>' +
+									'<div class="col-md-3"><img src="..#{image}collect.png" class="img-responsive" /></div>' +
+									'</div>';
+							html = html.replace(/#{id}/g, list[i].id);
+							html = html.replace(/#{title}/g, list[i].title);
+							html = html.replace(/#{price}/g, list[i].price);
+							html = html.replace(/#{image}/g, list[i].image);
+
+							$("#hot-list").append(html);
+						}
+					},
+					error: function (xhr) {
+						alert("产生未知的异常。错误信息：" + xhr.message);
+					}
+				});
+			}
+
+		</script>
+
 	</body>
 
 </html>

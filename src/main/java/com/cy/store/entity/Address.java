@@ -144,15 +144,15 @@ public class Address extends BaseEntity implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Address)) return false;
         if (!super.equals(o)) return false;
         Address address1 = (Address) o;
-        return Objects.equals(aid, address1.aid) && Objects.equals(uid, address1.uid) && Objects.equals(name, address1.name) && Objects.equals(provinceName, address1.provinceName) && Objects.equals(provinceCode, address1.provinceCode) && Objects.equals(cityName, address1.cityName) && Objects.equals(cityCode, address1.cityCode) && Objects.equals(areaName, address1.areaName) && Objects.equals(areaCode, address1.areaCode) && Objects.equals(zip, address1.zip) && Objects.equals(address, address1.address) && Objects.equals(phone, address1.phone) && Objects.equals(tel, address1.tel) && Objects.equals(tag, address1.tag) && Objects.equals(isDefault, address1.isDefault);
+        return Objects.equals(getAid(), address1.getAid()) && Objects.equals(getUid(), address1.getUid()) && Objects.equals(getName(), address1.getName()) && Objects.equals(getProvinceName(), address1.getProvinceName()) && Objects.equals(getProvinceCode(), address1.getProvinceCode()) && Objects.equals(getCityName(), address1.getCityName()) && Objects.equals(getCityCode(), address1.getCityCode()) && Objects.equals(getAreaName(), address1.getAreaName()) && Objects.equals(getAreaCode(), address1.getAreaCode()) && Objects.equals(getZip(), address1.getZip()) && Objects.equals(getAddress(), address1.getAddress()) && Objects.equals(getPhone(), address1.getPhone()) && Objects.equals(getTel(), address1.getTel()) && Objects.equals(getTag(), address1.getTag()) && Objects.equals(getIsDefault(), address1.getIsDefault());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), aid, uid, name, provinceName, provinceCode, cityName, cityCode, areaName, areaCode, zip, address, phone, tel, tag, isDefault);
+        return Objects.hash(super.hashCode(), getAid(), getUid(), getName(), getProvinceName(), getProvinceCode(), getCityName(), getCityCode(), getAreaName(), getAreaCode(), getZip(), getAddress(), getPhone(), getTel(), getTag(), getIsDefault());
     }
 
     @Override
