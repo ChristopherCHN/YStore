@@ -326,6 +326,7 @@
 								$("#product-image-" + i + "-big").attr("src", ".." + json.data.image + i + "_big.png");
 								$("#product-image-" + i).attr("src", ".." + json.data.image + i + ".jpg");
 							}
+
 						} else if (json.state == 4006) {
 							alert("商品不存在，即将为您跳转到首页！");
 							location.href = "index.html";
@@ -339,6 +340,32 @@
 				});
 			});
 
+			//启动对（加入购物车）按钮的监听
+			$("#btn-add-to-cart").click(function () {
+				console.log(id);
+				console.log("num.val = " + $("#num").val());
+				$.ajax({
+					url: "/carts/add_to_cart",
+					type: "POST",
+					//表单数据的序列化
+					data: {
+						"pid" : id, // script开头获取过了
+						"amount" : $("#num").val() // 用选择器选中名为num的标签，获取它的值
+					},
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							alert("加入购物车成功！");
+							location.href = "./index.html";
+						} else {
+							alert("加入购物车失败！");
+						}
+					},
+					error: function (xhr) {
+						alert("加入购物车时产生未知的异常。错误信息：" + xhr.message);
+					}
+				});
+			});
 
 		</script>
 

@@ -20,7 +20,8 @@
 		<link rel="stylesheet" type="text/css" href="../css/top.css" />
 		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
 		<link rel="stylesheet" type="text/css" href="../css/cart.css" />
-		<script src="../js/cart.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script src="../js/cart.js" type="text/javascript" charset="utf-8"></script>
+		-->
 	</head>
 
 	<body>
@@ -267,13 +268,101 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+
 		<script type="text/javascript">
+			/*
 			$(function() {
 				//返回链接
 				$(".link-account").click(function() {
 					location.href = "orderConfirm.html";
 				})
-			})
+			})*/
+
+			$(document).ready(function () {
+				showCartList();
+				
+			});
+
+			// 用这个方法展示购物车列表数据
+			function showCartList() {
+				// 清空tbody中的静态代码
+				$("#cart-list").empty();
+				$.ajax({
+					url: "/carts/",
+					type: "POST",
+					// 没有数据要传下去，只有传过来的
+					dataType: "JSON",
+					success: function (json) {
+						let list = json.data;
+						console.log(list);
+						for (let i=0; i<list.length; i++) {
+							let tr = '<tr>\n' +
+									'<td>\n' +
+									'<input name="cids" type="checkbox" value="#{cid}" class="ckitem" />\n' +
+									'</td>\n' +
+									'<td><img src="..#{image}collect.png" class="img-responsive" /></td>\n' +
+									'<td>#{title}#{msg}</td>\n' +
+									'<td>¥<span id="goodsPrice#{cid}">#{price}</span></td>\n' +
+									'<td>\n' +
+									'<input id="price-#{cid}" type="button" value="-" class="num-btn" onclick="reduceNum(2)" />\n' +
+									'<input id="goodsCount#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">\n' +
+									'<input id="price+#{cid}" type="button" value="+" class="num-btn" onclick="addNum(#{cid})" />\n' +
+									'</td>\n' +
+									'<td><span id="goodsCast#{cid}">#{totalPrice}</span></td>\n' +
+									'<td>\n' +
+									'<input type="button" onclick="delCartItem(this)" class="cart-del btn btn-default btn-xs" value="删除" />\n' +
+									'</td>\n' +
+									'</tr>';
+							tr = tr.replace(/#{cid}/g, list[i].cid);
+							tr = tr.replace(/#{image}/g, list[i].image);
+							tr = tr.replace(/#{title}/g, list[i].title);
+							tr = tr.replace(/#{msg}/g, list[i].realPrice);
+							tr = tr.replace(/#{price}/g, list[i].price);
+							tr = tr.replace(/#{num}/g, list[i].num);
+							tr = tr.replace(/#{totalPrice}/g, list[i].price * list[i].num);
+
+							$("#cart-list").append(tr);
+						}
+					},
+					error: function (xrl) {
+						alert("购物车列表数据加载产生未知的异常！" + xrl.status);
+					}
+				});
+			}
+
+			// 字符串里提到过的addNum方法
+			function addNum(cid) {
+				$.ajax({
+					url: "/carts/" + cid + "/num/add",
+					type: "POST",
+					// 没有数据要传下去，只有传过来的
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							// 因为字符串的替代（cid的加入）已经完成了，
+							// 所以一旦加载结束，增减按钮绑定的onclick函数中，
+							// addNum()方法内部的cid值也已经确定
+							// 只需要把相应商品goodsCount标签赋值就好了
+							$("#goodsCount" + cid).val(json.data);
+							// 改总额（重新乘）
+							// 因为price的值不是放在value上，也不是放在哪个属性上，
+							// 所以用html方法直接获取标签下的内容（不管具体是什么）
+							let price = $("#goodsPrice" + cid).html();
+							let totalPrice = price * json.data;
+							// 选中显示总价的元素，把新的值放在内部而非赋值给某个属性
+							$("#goodsCast" + cid).html(totalPrice);
+						}
+						else {
+							alert("增加购物车数据失败，具体信息：" + json.message);
+						}
+
+					},
+					error: function (xrl) {
+						alert("增加购物车商品数量时，产生未知的异常！" + xrl.status);
+					}
+				});
+			}
+
 		</script>
 	</body>
 
