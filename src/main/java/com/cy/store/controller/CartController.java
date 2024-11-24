@@ -51,4 +51,13 @@ public class CartController extends BaseController{
                                             getUsernameFromSession(session));
         return new JsonResult<>(OK, data);
     }
+
+    @RequestMapping("list")
+    //
+    public JsonResult<List<CartVO>> getVOByCid(Integer[] cids,
+                                               HttpSession session) {
+        Integer uid = getUidFromSession(session);
+        List<CartVO> data = cartService.getVOByCid(uid, cids);
+        return new JsonResult<>(OK, data);
+    }
 }

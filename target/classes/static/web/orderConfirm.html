@@ -21,7 +21,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
 		<link rel="stylesheet" type="text/css" href="../css/orderConfirm.css" />
 		<link rel="stylesheet" type="text/css" href="../css/cart.css" />
-		<script src="../js/orderConfirm.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script src="../js/orderConfirm.js" type="text/javascript" charset="utf-8"></script>-->
 	</head>
 
 	<body>
@@ -249,6 +249,100 @@
 
 		</footer>
 		<!--页脚结束-->
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			showAddressList();
+			showCartList();
+		});
+
+		// 用这个方法展示购物车列表数据
+		function showCartList() {
+			// 清空tbody中的静态代码
+			$("#cart-list").empty();
+			// console.log(location.search.substring(0));
+			// console.log(location.search.substring(1));
+			/* if(location.search.length <= 1){
+				alert("请选中要购买的商品！");
+				event.preventDefault();
+			}*/
+			$.ajax({
+				url: "/carts/list",
+				type: "POST",
+				// cart.html的结算按钮用了submit，已经自动把cid参数传到url里
+				// 系统只传递有name属性的组件的value，复选框有name所以传递
+				// 但有一个问题：传递是直接传到物理地址后面了，而非控制层的虚拟地址
+				// 为了传到虚拟地址里，需要把data主动获取到并注入
+				data: location.search.substring(1),
+				dataType: "JSON",
+				success: function (json) {
+					if (json.state == 200) {
+						let list = json.data;
+						console.log(list);
+						let allCount = 0;
+						let allPrice = 0;
+						for (let i = 0; i < list.length; i++) {
+							let tr = '<tr>\n' +
+									'<td><img src="..#{image}collect.png" class="img-responsive" /></td>\n' +
+									'<td>#{title}</td>\n' +
+									'<td>¥<span>#{price}</span></td>\n' +
+									'<td>#{num}</td>\n' +
+									'<td><span>#{totalPrice}</span></td>\n' +
+									'</tr>'
+							tr = tr.replace(/#{image}/g, list[i].image);
+							tr = tr.replace(/#{title}/g, list[i].title);
+							tr = tr.replace(/#{price}/g, list[i].price);
+							tr = tr.replace(/#{num}/g, list[i].num);
+							tr = tr.replace(/#{totalPrice}/g, list[i].price * list[i].num);
+
+							// console.log(tr);
+							$("#cart-list").append(tr);
+
+							allCount += list[i].num;
+							allPrice += list[i].price * list[i].num;
+						}
+						$("#all-count").html(allCount);
+						$("#all-price").html(allPrice);
+
+					}
+				},
+				error: function (xrl) {
+					alert("购物车列表数据加载产生未知的异常！" + xrl.status);
+				}
+			});
+		}
+
+		function showAddressList() {
+			// 清空select标签内原有的数据
+			$("#address-list").empty();
+			$.ajax({
+				url: "/addresses/",
+				type: "POST",
+				dataType: "JSON",
+				success: function (json) {
+					if (json.state == 200) {
+						let list = json.data;
+						// 顺便添加一个value属性，以便往其他页面传递
+						for (let i=0; i<list.length; i++) {
+							let opt = '<option value="#{aid}">#{name}&nbsp;&nbsp;&nbsp;#{tag}&nbsp;&nbsp;&nbsp;#{provinceName}#{cityName}#{address}&nbsp;&nbsp;&nbsp;#{phone}</option>';
+							opt = opt.replace(/#{aid}/g, list[i].aid);
+							opt = opt.replace(/#{name}/g, list[i].name);
+							opt = opt.replace(/#{provinceName}/g, list[i].provinceName);
+							opt = opt.replace(/#{cityName}/g, list[i].cityName);
+							opt = opt.replace(/#{address}/g, list[i].address);
+
+							$("#address-list").append(opt);
+						}
+					}
+				},
+				error: function (xrl) {
+					alert("订单确认页面内 收货地址数据加载产生未知的异常！" + xrl.status);
+				}
+			});
+		}
+
+	</script>
+
 	</body>
 
 </html>

@@ -65,5 +65,25 @@
         FROM t_cart
         WHERE cid=#{cid}
     </select>
+
+    <select id="findVOByCid" resultType="com.cy.store.vo.CartVO">
+        SELECT
+        cid, uid, pid,
+        t_cart.price, t_cart.num,
+        t_product.title, t_product.image,
+        t_product.price AS realPrice
+        FROM
+        t_cart LEFT JOIN t_product
+        ON
+        t_cart.pid = t_product.id
+        WHERE
+        cid IN (
+            <foreach collection="array" item="cid" separator=",">
+                #{cid}
+            </foreach>
+        )
+        ORDER BY
+        t_cart.created_time DESC
+    </select>
     
 </mapper>

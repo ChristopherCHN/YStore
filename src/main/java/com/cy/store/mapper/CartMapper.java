@@ -45,4 +45,6 @@ public interface CartMapper {
 
     Cart findByCid(Integer cid);
 
+    List<CartVO> findVOByCid(Integer[] cids);
+
 }

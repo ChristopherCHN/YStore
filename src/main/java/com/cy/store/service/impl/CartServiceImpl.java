@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -100,5 +101,29 @@ public class CartServiceImpl implements ICartService {
         }
         // 返回新的商品数，准备给前端显示
         return num;
+    }
+
+    @Override
+    public List<CartVO> getVOByCid(Integer uid, Integer[] cids) {
+        List<CartVO> list = cartMapper.findVOByCid(cids);
+        // 这个判断是自己加的，为了避免购物车不勾选任何数据而产生异常
+        if (list.isEmpty()) {
+            throw new CartNotFoundException("未选中任何商品！");
+        }
+
+        // 判断查出来的数据是否属于当前用户
+        Iterator<CartVO> it = list.iterator();
+        while (it.hasNext()) {
+            CartVO cartVO = it.next();
+            // 如果当前数据不属于当前用户
+            if (! cartVO.getUid().equals(uid)) {
+                // 从集合中移除这个元素
+                // list.remove(cartVO);
+
+                // 迭代器的remove方法，线程安全，不会引发并发异常
+                it.remove();
+            }
+        }
+        return list;
     }
 }

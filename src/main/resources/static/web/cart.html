@@ -97,7 +97,7 @@
 						<p class="panel-title"><span class="fa fa-shopping-cart"></span> 购物车</p>
 					</div>
 					<div class="panel-body">
-						<form action="orderConfirm.html" role="form">
+						<form id="myForm" action="orderConfirm.html" role="form">
 							<!--购物车表格开始-->
 							<table class="cart-table" width="100%">
 								<thead>
@@ -113,6 +113,7 @@
 									</tr>
 								</thead>
 								<tbody id="cart-list" class="cart-body">
+								<!--
 									<tr>
 										<td>
 											<input type="checkbox" class="ckitem" />
@@ -164,6 +165,7 @@
 											<input type="button" onclick="delCartItem(this)" class="cart-del btn btn-default btn-xs" value="删除" />
 										</td>
 									</tr>
+									-->
 								</tbody>
 							</table>
 							<div class="total-bar">
@@ -175,7 +177,7 @@
 							</div>
 							<div>
 								<span class="pull-right">
-								<input type="submit" value="  结  算  " class="btn btn-primary btn-lg link-account" />
+								<input id="go-to-confirm" type="submit" value="  结  算  " class="btn btn-primary btn-lg link-account" />
 							</span>
 							</div>
 						</form>
@@ -280,8 +282,21 @@
 
 			$(document).ready(function () {
 				showCartList();
-				
+				checkBoxSelected();
 			});
+
+			function checkBoxSelected() {
+				// 阻止表单提交如果没有复选框被选中
+				$("#myForm").on("submit", function (e) {
+					let isChecked = $("input[name='cids']:checked").length > 0;
+					// isChecked是个布尔变量
+					if (!isChecked) {
+						e.preventDefault(); // 阻止表单提交
+						alert("请至少选择一件商品！");
+					}
+				});
+			}
+
 
 			// 用这个方法展示购物车列表数据
 			function showCartList() {

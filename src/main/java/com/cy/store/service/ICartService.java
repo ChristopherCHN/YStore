@@ -31,4 +31,10 @@ public interface ICartService {
      */
     Integer addNum(Integer cid, Integer uid, String username);
 
+    /**
+     *
+     * @param cids 包含要显示cid的数组
+     * @return
+     */
+    List<CartVO> getVOByCid(Integer uid, Integer[] cids);
 }
