@@ -256,6 +256,29 @@
 			showCartList();
 		});
 
+		$("#btn-create-order").click(function () {
+			// 为了获取地址编号aid，就是获取option标签的value，传给data
+			let aid = $("#address-list").val();
+			let cids = location.search.substring(1); //cids=4&cids=3
+			$.ajax({
+				url: "/order/create",
+				type: "POST",
+				// 地址栏上放着cid的若干个值
+				data: "aid="+aid+"&"+cids, //提交多类数据的一种写法
+				dataType: "JSON",
+				success: function (json) {
+					if (json.state == 200) {
+						location.href = "payment.html";
+						console.log(json.data);
+						alert("订单创建成功！");
+					}
+				},
+				error: function (xrl) {
+					alert("订单数据加载时产生未知的异常！" + xrl.status);
+				}
+			});
+		});
+
 		// 用这个方法展示购物车列表数据
 		function showCartList() {
 			// 清空tbody中的静态代码
@@ -340,6 +363,8 @@
 				}
 			});
 		}
+
+
 
 	</script>
 

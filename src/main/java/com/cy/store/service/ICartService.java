@@ -31,6 +31,8 @@ public interface ICartService {
      */
     Integer addNum(Integer cid, Integer uid, String username);
 
+    Integer reduceNum(Integer cid, Integer uid, String username);
+
     /**
      *
      * @param cids 包含要显示cid的数组

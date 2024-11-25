@@ -104,6 +104,29 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
+    public Integer reduceNum(Integer cid, Integer uid,
+                             String username) {
+
+        Cart result = cartMapper.findByCid(cid);
+        if (result == null) {
+            throw new CartNotFoundException("购物车记录不存在");
+        }
+        if (! result.getUid().equals(uid)) {
+            throw new AccessDeniedException("数据非法访问！");
+        }
+        Integer num = result.getNum() - 1;
+        Integer rows = cartMapper.updateNumByCid(
+                cid, num,
+                username,
+                new Date());
+        if (rows != 1) {
+            throw new UpdateException("更新数据失败");
+        }
+        // 返回新的商品数，准备给前端显示
+        return num;
+    }
+
+    @Override
     public List<CartVO> getVOByCid(Integer uid, Integer[] cids) {
         List<CartVO> list = cartMapper.findVOByCid(cids);
         // 这个判断是自己加的，为了避免购物车不勾选任何数据而产生异常
@@ -126,4 +149,6 @@ public class CartServiceImpl implements ICartService {
         }
         return list;
     }
+
+
 }

@@ -12,7 +12,7 @@ public class CartVO implements Serializable {
     private Integer num;
     private String title;
     private String image;
-    private Integer realPrice;
+    private Long realPrice;
 
     public Integer getCid() {
         return cid;
@@ -70,11 +70,11 @@ public class CartVO implements Serializable {
         this.image = image;
     }
 
-    public Integer getRealPrice() {
+    public Long getRealPrice() {
         return realPrice;
     }
 
-    public void setRealPrice(Integer realPrice) {
+    public void setRealPrice(Long realPrice) {
         this.realPrice = realPrice;
     }
 

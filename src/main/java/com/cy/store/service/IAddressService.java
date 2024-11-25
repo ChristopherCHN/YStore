@@ -30,4 +30,11 @@ public interface IAddressService {
      */
     void delete(Integer aid, Integer uid, String username);
 
+    /**
+     *
+     * @param aid
+     * @return
+     */
+    Address getByAid(Integer aid, Integer uid);
+
 }

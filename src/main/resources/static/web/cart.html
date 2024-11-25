@@ -297,7 +297,6 @@
 				});
 			}
 
-
 			// 用这个方法展示购物车列表数据
 			function showCartList() {
 				// 清空tbody中的静态代码
@@ -319,7 +318,7 @@
 									'<td>#{title}#{msg}</td>\n' +
 									'<td>¥<span id="goodsPrice#{cid}">#{price}</span></td>\n' +
 									'<td>\n' +
-									'<input id="price-#{cid}" type="button" value="-" class="num-btn" onclick="reduceNum(2)" />\n' +
+									'<input id="price-#{cid}" type="button" value="-" class="num-btn" onclick="reduceNum(#{cid})" />\n' +
 									'<input id="goodsCount#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">\n' +
 									'<input id="price+#{cid}" type="button" value="+" class="num-btn" onclick="addNum(#{cid})" />\n' +
 									'</td>\n' +
@@ -349,6 +348,44 @@
 			function addNum(cid) {
 				$.ajax({
 					url: "/carts/" + cid + "/num/add",
+					type: "POST",
+					// 没有数据要传下去，只有传过来的
+					dataType: "JSON",
+					success: function (json) {
+						if (json.state == 200) {
+							// 因为字符串的替代（cid的加入）已经完成了，
+							// 所以一旦加载结束，增减按钮绑定的onclick函数中，
+							// addNum()方法内部的cid值也已经确定
+							// 只需要把相应商品goodsCount标签赋值就好了
+							$("#goodsCount" + cid).val(json.data);
+							// 改总额（重新乘）
+							// 因为price的值不是放在value上，也不是放在哪个属性上，
+							// 所以用html方法直接获取标签下的内容（不管具体是什么）
+							let price = $("#goodsPrice" + cid).html();
+							let totalPrice = price * json.data;
+							// 选中显示总价的元素，把新的值放在内部而非赋值给某个属性
+							$("#goodsCast" + cid).html(totalPrice);
+						}
+						else {
+							alert("增加购物车数据失败，具体信息：" + json.message);
+						}
+
+					},
+					error: function (xrl) {
+						alert("增加购物车商品数量时，产生未知的异常！" + xrl.status);
+					}
+				});
+			}
+
+			// 字符串里提到过的reduceNum方法
+			function reduceNum(cid) {
+				if($("#goodsCount" + cid).val() == 0) {
+					alert("不能再减少商品数量了！");
+					return false; // 组织后续操作
+				}
+
+				$.ajax({
+					url: "/carts/" + cid + "/num/reduce",
 					type: "POST",
 					// 没有数据要传下去，只有传过来的
 					dataType: "JSON",

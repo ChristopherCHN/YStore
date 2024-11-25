@@ -52,6 +52,15 @@ public class CartController extends BaseController{
         return new JsonResult<>(OK, data);
     }
 
+    @RequestMapping("{cid}/num/reduce")
+    public JsonResult<Integer> reduceNum(HttpSession session,
+                                      @PathVariable("cid") Integer cid) {
+        Integer data = cartService.reduceNum(cid,
+                getUidFromSession(session),
+                getUsernameFromSession(session));
+        return new JsonResult<>(OK, data);
+    }
+
     @RequestMapping("list")
     //
     public JsonResult<List<CartVO>> getVOByCid(Integer[] cids,
